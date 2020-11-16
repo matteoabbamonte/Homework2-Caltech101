@@ -29,18 +29,32 @@ class Caltech(VisionDataset):
           through the index
         - Labels should start from 0, so for Caltech you will have lables 0...100 (excluding the background class) 
         '''
+        # Open file in read only mode and read all lines
+        file = open(self.split, "r")
+        lines = file.readlines()
+
+        # Filter out the lines which start with 'BACKGROUND_Google' as asked in the homework
+        self.elements = [i for i in lines if not i.startswith('BACKGROUND_Google')]
+
+        # Delete BACKGROUND_Google class from dataset labels
+        self.classes = sorted(os.listdir(os.path.join(self.root, "")))
+        self.classes.remove("BACKGROUND_Google")
+
 
     def __getitem__(self, index):
-        '''
+        ''' 
         __getitem__ should access an element through its index
         Args:
             index (int): Index
-
         Returns:
             tuple: (sample, target) where target is class_index of the target class.
         '''
 
-        image, label = ... # Provide a way to access image and label via index
+        img = Image.open(os.path.join(self.root, self.elements[index].rstrip()))
+
+        target = self.classes.index(self.elements[index].rstrip().split('/')[0])
+
+        image, label = img, target # Provide a way to access image and label via index
                            # Image should be a PIL Image
                            # label can be int
 
@@ -55,5 +69,6 @@ class Caltech(VisionDataset):
         The __len__ method returns the length of the dataset
         It is mandatory, as this is used by several other components
         '''
-        length = ... # Provide a way to get the length (number of elements) of the dataset
+        # Provides a way to get the length (number of elements) of the dataset
+        length =  len(self.elements)
         return length
